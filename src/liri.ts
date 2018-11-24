@@ -15,7 +15,6 @@ const myMusic = {
     search(track: string) {
         this.musicConnection.search({ type: "track", query: track })
             .then((response) => {
-                // console.log(response);
                 this.formatSong(response);
             }, (err) => {
                 console.log(err);
@@ -28,29 +27,21 @@ const myMusic = {
 
         for (i in songList) {
             if (songList[i]) {
-                console.log(songList[i]);
-                stringOutput += "\n===================================================\n";
-
+                const albumName: string = songList[i].album.name;
+                const previewURL: string = songList[i].preview_url;
                 const artistList = songList[i].artists;
-                let previewURL: string = "";
 
+                stringOutput += "\n===================================================\n";
                 let artistOutput: string = "";
                 for (i in artistList) {
                     if (artistList[i]) {
                         artistOutput += `${artistList[i].name} `;
                     }
                 }
-
                 stringOutput += `Artist(s): ${artistOutput}\n`;
                 stringOutput += `Song: ${songList[i].name}\n`;
-
-                if (!songList[i].preview_url) {
-                    previewURL = "Not Available";
-                } else {
-                    previewURL = songList[i].preview_url;
-                }
                 stringOutput += `Preview: ${previewURL}\n`;
-                stringOutput += `Album: ${songList[i].album.name}\n`;
+                stringOutput += `Album: ${albumName}\n`;
                 stringOutput += "===================================================\n";
 
                 console.log(stringOutput);

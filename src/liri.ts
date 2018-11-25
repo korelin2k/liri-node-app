@@ -1,5 +1,6 @@
 import axios, { AxiosPromise, AxiosRequestConfig } from "axios";
 import * as dotenv from "dotenv";
+import * as fs from "fs";
 import * as inquirer from "inquirer";
 import * as moment from "moment";
 import * as spotify from "node-spotify-api";
@@ -137,18 +138,73 @@ const myMovie = {
     },
 };
 
+function parseFile() {
+    let i: any;
+    const fileName: string = "random.txt";
+    fs.readFile(fileName, "utf8", (err, data) => {
+        if (err) {
+            return console.error(err);
+        }
+
+        const fileOutput: string[] = data.toString().split("\n");
+        for (i in fileOutput) {
+            if (fileOutput[i]) {
+                const lineOutput: string[] = fileOutput[i].split(",");
+                parseQuestion(lineOutput[0], lineOutput[1]);
+            }
+        }
+    });
+}
+
+// Function to parse the question and search string and to send it to the appropriate lookup
+function parseQuestion(question: string, title: string) {
+    switch (question) {
+        case "concert-this":
+            if (!title) {
+                title = "Nine Inch Nails";
+            }
+
+            myBand.search(title);
+            break;
+        case "spotify-this-song":
+            if (!title) {
+                title = "Ace of Base";
+            }
+
+            myMusic.search(title);
+            break;
+        case "movie-this":
+            if (!title) {
+                title = "Mr. Nobody";
+            }
+
+            myMovie.search(title);
+            break;
+        case "do-what-it-says":
+            parseFile();
+            break;
+        case "exit":
+            console.log("Thank you for playing!");
+            process.exit();
+            break;
+        default:
+            console.log("Invalid input - exiting program");
+            process.exit();
+    }
+}
+
 // Function to integrate the chatbot with interactive Q&A
 function chatBot() {
     const questionType: inquirer.Questions = [
         {
-            choices: ["concert-this", "spotify-this-song", "movie-this", "exit"],
+            choices: ["concert-this", "spotify-this-song", "movie-this", "do-what-it-says", "exit"],
             message: "What do you want to try?",
             name: "question",
             type: "list",
         },
         {
             when(res: inquirer.Answers) {
-                return res.question !== "exit";
+                return (res.question !== "exit" && res.question !== "do-what-it-says");
             },
             message: "What do you want to search for?",
             name: "search",
@@ -157,34 +213,7 @@ function chatBot() {
     ];
 
     inquirer.prompt(questionType).then((res: inquirer.Answers) => {
-        let title: string = res.search;
-
-        switch (res.question) {
-            case "concert-this":
-                if (!title) {
-                    title = "Nine Inch Nails";
-                }
-
-                myBand.search(title);
-                break;
-            case "spotify-this-song":
-                if (!title) {
-                    title = "Ace of Base";
-                }
-
-                myMusic.search(title);
-                break;
-            case "movie-this":
-                if (!title) {
-                    title = "Mr. Nobody";
-                }
-
-                myMovie.search(title);
-                break;
-            case "exit":
-                process.exit();
-                break;
-        }
+        parseQuestion(res.question, res.search);
 
         // Giving it time to return the API call, hence the timeout
         setTimeout(chatBot, 3000);

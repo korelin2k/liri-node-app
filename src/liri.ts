@@ -57,20 +57,34 @@ const myMusic = {
 
 // Function to integrate the chatbot with interactive Q&A
 function chatBot() {
-    const questionType = [
+    const questionType: inquirer.Questions = [
         {
             choices: ["concert-this", "spotify-this-song", "movie-this", "exit"],
             message: "What do you want to try?",
             name: "question",
             type: "list",
-        }];
+        },
+        {
+            when(res: inquirer.Answers) {
+                return res.question !== "exit";
+            },
+            message: "What do you want to search for?",
+            name: "search",
+            type: "input",
+        },
+    ];
 
     inquirer.prompt(questionType).then((res: inquirer.Answers) => {
         switch (res.question) {
             case "concert-this":
                 break;
             case "spotify-this-song":
-                myMusic.search("The Day The World Went Away");
+                let songTitle: string = "Ace of Base";
+                if (res.search) {
+                    songTitle = res.search;
+                }
+
+                myMusic.search(songTitle);
                 break;
             case "movie-this":
                 break;
@@ -79,7 +93,8 @@ function chatBot() {
                 break;
         }
 
-        chatBot();
+        // Giving it time to return the API call, hence the timeout
+        setTimeout(chatBot, 3000);
     });
 }
 

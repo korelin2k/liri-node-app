@@ -141,6 +141,7 @@ const myMovie = {
     },
 };
 
+// Function to write all output to log.txt
 function writeOutput(output: string) {
     const fileName: string = "log.txt";
     fs.appendFile(fileName, output, (err) => {
@@ -233,4 +234,14 @@ function chatBot() {
     });
 }
 
-chatBot();
+// Pull in the variables
+if (process.argv[2] === "chat-bot") {
+    chatBot();
+} else if (!process.argv[2]) {
+    console.log("Invalid input! Try out \"chat-bot\" for an interactive bot today!");
+} else {
+    const question: string = process.argv[2];
+    const title: string = process.argv.splice(3, process.argv.length - 1).join(" ");
+
+    parseQuestion(question, title);
+}

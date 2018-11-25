@@ -1,5 +1,7 @@
+import axios, { AxiosPromise, AxiosRequestConfig } from "axios";
 import * as dotenv from "dotenv";
 import * as inquirer from "inquirer";
+import * as moment from "moment";
 import * as spotify from "node-spotify-api";
 
 // Pull in environment properties
@@ -52,6 +54,40 @@ const myMusic = {
 };
 
 // Band Object
+const myBand = {
+    search(bandName: string) {
+
+        const bandEndpoint = "https://rest.bandsintown.com/artists/" + bandName + "/events?app_id=codingbootcamp";
+        axios.get(bandEndpoint)
+            .then((response) => {
+                this.formatBand(response.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    },
+    formatBand(bandDetails: any) {
+        let i: any;
+        let stringOutput: string = "";
+
+        for (i in bandDetails) {
+            if (bandDetails[i]) {
+                const venueName = bandDetails[i].venue.name;
+                const venueLoc = bandDetails[i].venue.city + ", " + bandDetails[i].venue.country;
+                const venueDate = moment.utc(bandDetails[i].datetime).format("MM/DD/YYYY");
+
+                stringOutput += "\n===================================================\n";
+                stringOutput += `Venue Name: ${venueName}\n`;
+                stringOutput += `Venue Location: ${venueLoc}\n`;
+                stringOutput += `Venue Date: ${venueDate}\n`;
+                stringOutput += "\n===================================================\n";
+
+                console.log(stringOutput);
+                stringOutput = "";
+            }
+        }
+    },
+};
 
 // Movie Object
 
@@ -75,16 +111,22 @@ function chatBot() {
     ];
 
     inquirer.prompt(questionType).then((res: inquirer.Answers) => {
+        let title: string = res.search;
+
         switch (res.question) {
             case "concert-this":
-                break;
-            case "spotify-this-song":
-                let songTitle: string = "Ace of Base";
-                if (res.search) {
-                    songTitle = res.search;
+                if (!title) {
+                    title = "Nine Inch Nails";
                 }
 
-                myMusic.search(songTitle);
+                myBand.search(title);
+                break;
+            case "spotify-this-song":
+                if (!title) {
+                    title = "Ace of Base";
+                }
+
+                myMusic.search(title);
                 break;
             case "movie-this":
                 break;

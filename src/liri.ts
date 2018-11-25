@@ -47,6 +47,7 @@ const myMusic = {
                 stringOutput += `Album: ${albumName}\n`;
                 stringOutput += "===================================================\n";
 
+                writeOutput(stringOutput);
                 console.log(stringOutput);
                 stringOutput = "";
             }
@@ -82,6 +83,7 @@ const myBand = {
                 stringOutput += `Venue Date: ${venueDate}\n`;
                 stringOutput += "\n===================================================\n";
 
+                writeOutput(stringOutput);
                 console.log(stringOutput);
                 stringOutput = "";
             }
@@ -134,10 +136,21 @@ const myMovie = {
         stringOutput += `Actors: ${movieActors}\n`;
         stringOutput += "\n===================================================\n";
 
+        writeOutput(stringOutput);
         console.log(stringOutput);
     },
 };
 
+function writeOutput(output: string) {
+    const fileName: string = "log.txt";
+    fs.appendFile(fileName, output, (err) => {
+        if (err) {
+            return console.log(err);
+        }
+    });
+}
+
+// Function to parse the random.txt file and call parseQuestion
 function parseFile() {
     let i: any;
     const fileName: string = "random.txt";

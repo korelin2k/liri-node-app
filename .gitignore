@@ -3,3 +3,4 @@ compiled
 .DS_Store
 .env
 package-lock.json
+log.txt

@@ -56,8 +56,7 @@ const myMusic = {
 // Band Object
 const myBand = {
     search(bandName: string) {
-
-        const bandEndpoint = "https://rest.bandsintown.com/artists/" + bandName + "/events?app_id=codingbootcamp";
+        const bandEndpoint: string = `https://rest.bandsintown.com/artists/${bandName}/events?app_id=codingbootcamp`;
         axios.get(bandEndpoint)
             .then((response) => {
                 this.formatBand(response.data);
@@ -90,6 +89,53 @@ const myBand = {
 };
 
 // Movie Object
+const myMovie = {
+    search(movieName: string) {
+        const apiKey: string = "trilogy";
+        const movieEndpoint: string = `http://www.omdbapi.com/?apikey=${apiKey}&&t=${movieName}`;
+        axios.get(movieEndpoint)
+            .then((response) => {
+                this.formatMovie(response.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    },
+    formatMovie(movieDetails: any) {
+        let stringOutput: string = "";
+
+        const movieTitle: string = movieDetails.Title;
+        const movieYear: string = movieDetails.Year;
+        const movieCountry: string = movieDetails.Country;
+        const movieLang: string = movieDetails.Language;
+        const moviePlot: string = movieDetails.Plot;
+        const movieActors: string = movieDetails.Actors;
+        let movieIMDBRating: string = "Not Available";
+        let movieRTRating: string = "Not Available";
+
+        // have to break up the ratings response... this API sucks
+        movieDetails.Ratings.forEach((element: any) => {
+            if (element.Source === "Internet Movie Database" || element.Source === "IMDB") {
+                movieIMDBRating = element.Value;
+            } else if (element.Source === "Rotten Tomatoes" || element.Source === "RT") {
+                movieRTRating = element.Value;
+            }
+        });
+
+        stringOutput += "\n===================================================\n";
+        stringOutput += `Title: ${movieTitle}\n`;
+        stringOutput += `Year: ${movieYear}\n`;
+        stringOutput += `IMDB Rating: ${movieIMDBRating}\n`;
+        stringOutput += `RT Rating: ${movieRTRating}\n`;
+        stringOutput += `Country: ${movieCountry}\n`;
+        stringOutput += `Language: ${movieLang}\n`;
+        stringOutput += `Plot: ${moviePlot}\n`;
+        stringOutput += `Actors: ${movieActors}\n`;
+        stringOutput += "\n===================================================\n";
+
+        console.log(stringOutput);
+    },
+};
 
 // Function to integrate the chatbot with interactive Q&A
 function chatBot() {
@@ -129,6 +175,11 @@ function chatBot() {
                 myMusic.search(title);
                 break;
             case "movie-this":
+                if (!title) {
+                    title = "Mr. Nobody";
+                }
+
+                myMovie.search(title);
                 break;
             case "exit":
                 process.exit();
